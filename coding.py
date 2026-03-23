@@ -1,23 +1,16 @@
-# Python Program to calculate the square root
-
-# Note: change this value for a different result
-#num = 8 
-
-## sources/calc.py
-
 import sys
 
 def sqrt_value(n: float) -> float:
     return n ** 0.5
 
 def main():
-    # Try command-line argument first: python3 sources/calc.py --num 8
+    # Try command-line argument first: python3 coding.py --num 8
     if "--num" in sys.argv:
         try:
             idx = sys.argv.index("--num") + 1
             num = float(sys.argv[idx])
         except (ValueError, IndexError):
-            print("Usage: python3 sources/calc.py --num <number>")
+            print("Usage: python3 coding.py --num <number>")
             sys.exit(2)
     else:
         # Fallback to hardcoded value or uncomment input line
@@ -29,5 +22,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-`` To take the input from the user
-
