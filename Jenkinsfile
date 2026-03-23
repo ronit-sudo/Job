@@ -44,16 +44,8 @@ pipeline {
 
         stage('Archive Artifacts') {
             steps {
-                sh '''
-                    mkdir -p dist
-                    # Copy any compiled caches if present
-                    if [ -d __pycache__ ]; then cp -r __pycache__ dist/; fi
-                    # Collect nested __pycache__ too
-                    if [ -d sources ]; then
-                        find sources -type d -name "__pycache__" -exec bash -c 'mkdir -p "dist/${0}"; cp -r "${0}/"* "dist/${0}/" 2>/dev/null || true' {} \\;
-                    fi
-                '''
-                archiveArtifacts artifacts: 'dist/**, calc_output.txt', fingerprint: true
+                // Archive __pycache__ wherever they are + output file
+                archiveArtifacts artifacts: '**/__pycache__/**, calc_output.txt', fingerprint: true
             }
         }
     }
@@ -67,4 +59,4 @@ pipeline {
         }
     }
 }
-``
+
