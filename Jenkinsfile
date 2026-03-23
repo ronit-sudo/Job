@@ -22,7 +22,12 @@ pipeline {
                 sh '''
                     set -e
                     # Compile all Python files under sources/
-                    find sources -name "*.py" -print -exec python3 -m py_compile {} \\;
+                    if [ -d sources ]; then
+                        find sources -name "*.py" -print -exec python3 -m py_compile {} \\;
+                    else
+                        echo "Directory 'sources' not found. Adjust path or create it."
+                        exit 1
+                    fi
                 '''
             }
         }
@@ -37,21 +42,17 @@ pipeline {
             }
         }
 
-        // Uncomment if you add pytest and tests/
-        // stage('Test') {
-        //     steps {
-        //         sh '''
-        //             set -e
-        //             python3 -m pip install --user pytest
-        //             pytest -q --maxfail=1
-        //         '''
-        //     }
-        // }
-
         stage('Archive Artifacts') {
             steps {
-                // Archive compiled bytecode and any outputs
-                sh 'mkdir -p dist && cp -r __pycache__ dist/ 2>/dev/null || true'
+                sh '''
+                    mkdir -p dist
+                    # Copy any compiled caches if present
+                    if [ -d __pycache__ ]; then cp -r __pycache__ dist/; fi
+                    # Collect nested __pycache__ too
+                    if [ -d sources ]; then
+                        find sources -type d -name "__pycache__" -exec bash -c 'mkdir -p "dist/${0}"; cp -r "${0}/"* "dist/${0}/" 2>/dev/null || true' {} \\;
+                    fi
+                '''
                 archiveArtifacts artifacts: 'dist/**, calc_output.txt', fingerprint: true
             }
         }
